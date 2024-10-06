@@ -9,6 +9,8 @@ function RutasMasCortas() {
     const [nombresPorDefecto, setNombresPorDefecto] = useState([
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"
     ]);
+    const [tablasD, setTablasD] = useState([]);
+    const [tablasP, setTablasP] = useState([]);
 
     useEffect(() => {
         inicializarNodos();
@@ -61,12 +63,13 @@ function RutasMasCortas() {
             rutas.push(ruta);
         }
         setRutas(rutas);
+        
     }
 
     const handleInputChange = (row, col, value) => {
         setRutas((prev) => {
             const newRutas = [...prev];
-            newRutas[row - 1][col - 1] = value;
+            newRutas[row - 1][col - 1] = parseInt(value, 10);
             return newRutas;
         });
         
@@ -79,6 +82,79 @@ function RutasMasCortas() {
             return newRutas;
         });
     };
+
+
+        const calcularRutasMasCortas = () => {
+        let tablasD = [];
+        let tablasP = [];
+    
+        // Initialize tablasD and tablasP for k = 0
+        let tablaD0 = [];
+        let tablaP0 = [];
+        for (let i = 0; i < cantidadNodos; i++) {
+            let filaD = [];
+            let filaP = [];
+            for (let j = 0; j < cantidadNodos; j++) {
+                if (i === j) {
+                    filaD.push(0);
+                    filaP.push(0);
+                } else {
+                    filaD.push(rutas[i][j]);
+                    filaP.push(j + 1);
+                }
+            }
+            tablaD0.push(filaD);
+            tablaP0.push(filaP);
+        }
+        tablasD.push(tablaD0);
+        tablasP.push(tablaP0);
+    
+        
+
+        for (let k = 1; k <= cantidadNodos; k++) {
+            let tablaD = [];
+            let tablaP = [];
+            for (let i = 0; i < cantidadNodos; i++) {
+                let filaD = [];
+                let filaP = [];
+                                for (let j = 0; j < cantidadNodos; j++) {
+                    let d1 = tablasD[k - 1][i][j] === "X" ? Infinity : parseInt(tablasD[k - 1][i][j], 10);
+                    let d2 = tablasD[k - 1][i][k - 1] === "X" || tablasD[k - 1][k - 1][j] === "X" 
+                             ? Infinity 
+                             : parseInt(tablasD[k - 1][i][k - 1], 10) + parseInt(tablasD[k - 1][k - 1][j], 10);
+                
+                    if (d1 === Infinity && d2 === Infinity) {
+                        filaD.push("X");
+                        filaP.push("X");
+                    } else if (d1 === Infinity) {
+                        filaD.push(d2);
+                        filaP.push(k);
+                    } else if (d2 === Infinity) {
+                        filaD.push(d1);
+                        filaP.push(tablasP[k - 1][i][j]);
+                    } else {
+                        if (d1 <= d2) {
+                            filaD.push(d1);
+                            filaP.push(tablasP[k - 1][i][j]);
+                        } else {
+                            filaD.push(d2);
+                            filaP.push(k);
+                        }
+                    }
+                }
+                tablaD.push(filaD);
+                tablaP.push(filaP);
+            }
+            tablasD.push(tablaD);
+            tablasP.push(tablaP);
+        }
+    
+        setTablasD(tablasD);
+        setTablasP(tablasP);
+        console.log("tablasD", tablasD);
+        console.log("tablasP", tablasP);
+    };
+
 
     const generarTablaD0 = () => {
         return (
@@ -144,7 +220,9 @@ function RutasMasCortas() {
             </div>
             <div>
                 <button onClick={inicializarRutas}>Limpiar</button>
-                <button>Calcular</button>
+                <button
+                    onClick={calcularRutasMasCortas}
+                >Calcular</button>
             </div>
             <div>
                 {generarTablaD0()}
