@@ -5,6 +5,7 @@ function ArbolesBinariosBusqueda() {
     const [n, setN] = useState(0);
     const [nodos, setNodos] = useState([]); // [{llave: 'a', peso: 1}, {llave: 'b', peso: 2}]
     const [matrizPesos, setMatrizPesos] = useState([]); // [[0, 1, 2], [1, 0, 3], [2, 3, 0]]
+    const [matrizR, setMatrizR] = useState([]); 
 
     useEffect(() => {
         generarNodos();
@@ -45,6 +46,13 @@ function ArbolesBinariosBusqueda() {
 
     const calcularMatrizPesos = () => {
 
+        let matrizR = [];
+        for (let i = 0; i <= n; i++) {
+            matrizR[i] = [];
+            for (let j = 0; j <= n; j++) {
+                matrizR[i][j] = 0;
+            }
+        }
 
         let matrizPesos = [];
         for (let i = 0; i <= n; i++) {
@@ -68,6 +76,7 @@ function ArbolesBinariosBusqueda() {
                     let peso = matrizPesos[i][k - 1] + matrizPesos[k][j];
                     if (peso < min) {
                         min = peso;
+                        matrizR[i][j] = k;
                     }
                     sumatoriaPesos += nodos[k - 1].peso;
                 }
@@ -81,6 +90,9 @@ function ArbolesBinariosBusqueda() {
             }
         }
 
+        console.log(matrizPesos);
+        console.log(matrizR);
+        setMatrizR(matrizR);
         setMatrizPesos(matrizPesos);
 
 
@@ -177,6 +189,38 @@ function ArbolesBinariosBusqueda() {
                     </table>
                 </div>
             )}
+            {matrizR.length > 0 && (
+                <div>
+                    <p>Matriz R:</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                {nodos.map((nodo, index) => (
+                                    <th key={index}>{nodo.llave}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {matrizR.map((fila, index) => (
+                                <tr key={index}>
+                                    <td>{index === 0 ? '': nodos[index-1].llave}</td>
+                                    {fila.map((r, index2) => (
+                                        <td key={index2}>
+                                            <input type="number" value={r} onChange={(e) => {
+                                                let newMatriz = [...matrizR];
+                                                newMatriz[index][index2] = e.target.value;
+                                                setMatrizR(newMatriz);
+                                            }} />
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    </div>
+            )}
+
 
 
         </div>
