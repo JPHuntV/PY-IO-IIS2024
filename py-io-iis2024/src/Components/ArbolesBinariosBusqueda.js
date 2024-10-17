@@ -124,6 +124,7 @@ function ArbolesBinariosBusqueda() {
 
     return (
         <div>
+            <h1>Arboles Binarios de Busqueda</h1>
             <input type="number" value={n} onChange={(e) => setN(e.target.value)}  disabled={matrizPesos.length > 0} />
             <button onClick={() => limpiar()}>Limpiar</button>
             <button onClick={() => cargarArchivo()}>Cargar archivo</button>

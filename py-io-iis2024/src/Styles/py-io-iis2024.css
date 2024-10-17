@@ -1,21 +1,156 @@
-.juegaLocal {
-  background-color: #5eff00;
-  border: 1px solid #e7e7e7;
+html {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+/*home*/
+body {
+  background-color: #f0f0f0;
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+.home {
+  width: 100%;
+}
+.header {
+  background-color: #4CAF50;
+  color: white;
+  text-align: left;
+  align-content: center;
+  justify-content: center;
+  padding-left: 10% !important;
+}
+
+.header h1 {
+  padding: 15px;
+  margin: 0;
+  font-size: 24px;
+}
+
+.main-container {
+  width: 80%;
+  margin: 0 auto;
+  background-color: white;
+  border: 2px solid #4CAF50;
+  padding: 20px;
   border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 0;
+  margin-top: 50px;
+}
+
+.button-group {
+  display: flex;
+  margin-bottom: 0;
+  z-index: 1;
+  position: relative;
+  
+}
+
+.button-group button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  margin-right: 10px;
+  border-radius: 5px 5px 0 0; 
+  transition: background-color 0.3s ease;
+  position: relative;
+  top: -60px; 
+  height: 40px;
+}
+
+.button-group button:hover {
+  background-color: #45a049;
+}
+
+.button-group button.active {
+  background-color: white;
+  color: #4CAF50;
+  border: 2px solid #4CAF50;
+  border-bottom: none;
+  z-index: 2;
+}
+
+
+.main-content {
+  margin-top: -30px;
+}
+
+
+/*Series deportivas*/
+
+
+
+.seriesDeportivas {
+  width: 100%;
+}
+
+.seriesDeportivas .container {
+  
+
+  
+}
+
+.form-group {
+  display: flex;
+  flex: 1;
+  padding: 15px;
+  flex-direction: column;
+
+}
+
+.distribucionPartidos {
+  flex-direction: row !important;
+  width: 60%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 15px;
+  box-sizing: border-box;
+
+  
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
   padding: 10px;
-  margin: 10px 0;
+  margin: 5px 0;
+  border: 1px solid #e7e7e7;
+  box-sizing: border-box;
+
+}
+
+.juegaLocal {
+  background-color: #ffffff;
+  border-radius: 100px;
+  padding: 15px;
+  margin: 20px 0;
+  border: 2px solid #45a049;
+  color: #45a049;
 }
 
 .juegaVisita{
-    background-color: #ff0000;
-    border: 1px solid #e7e7e7;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px 0;
+  background-color: #ffffff;
+  border-radius: 50%;
+  padding: 15px;
+  margin: 20px 0;
+  border: 2px solid #ff0000;
+  color: #ff0000;
   }
 
 .celdaLocal {
-  background-color: #5eff00;
+  background-color: #4CAF50;
+  color: #ffffff;
   border: 1px solid #e7e7e7;
   border-radius: 5px;
   padding: 10px;
@@ -24,6 +159,7 @@
 
 .celdaVisita {
   background-color: #ff0000;
+  color: #ffffff;
   border: 1px solid #e7e7e7;
   border-radius: 5px;
   padding: 10px;
@@ -36,4 +172,58 @@
   border-radius: 5px;
   padding: 10px;
   margin: 10px 0;
+}
+
+
+/**************************/
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+}
+
+.col {
+  flex: 1;
+  margin: 10px;
+  padding: 15px;
+  border: 1px solid #e7e7e7;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+}
+
+.primary-button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border-radius: 5px;
+}
+.table th, .table td {
+  border: 1px solid #e7e7e7;
+  padding: 8px;
+  text-align: center;
+}
+
+.table th {
+  background-color: #f2f2f2;
+  text-align: center;
 }

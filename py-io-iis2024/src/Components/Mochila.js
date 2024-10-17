@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Mochila = () => {
     const [objetos, setObjetos] = useState([]);
     const [capacidad, setCapacidad] = useState(0);
     const [matrizSolucion, setMatrizSolucion] = useState([]);
     const [tipo, setTipo] = useState("bounded");
+    const [componentesSolucion, setComponentesSolucion] = useState([]);
 
     const handleAddObjeto = () => {
         if (objetos.length < 10) {
@@ -81,11 +82,46 @@ const Mochila = () => {
         }
 
         console.log(dp);
-
         setMatrizSolucion(dp);
 
 
     };
+
+    useEffect(() => {
+        if (matrizSolucion.length > 0) {
+            console.log(encontrarComponentesSolucion(matrizSolucion));
+        }
+    }, [matrizSolucion]);
+
+    const encontrarComponentesSolucion = (matriz) => {
+    let numFilas = matriz.length;
+    let numColumnas = matriz[0].length;
+
+    let capacidad = numFilas - 1; // Última fila (capacidad máxima)
+    let columna = numColumnas - 1; // Última columna (valor máximo)
+
+    let objetosSeleccionados = [];
+
+    while (capacidad > 0 && columna > 0) {
+        // Si el valor actual es diferente al de la fila anterior, significa que se seleccionó un objeto
+        if (matriz[capacidad][columna] !== matriz[capacidad - 1][columna]) {
+            // Añadimos el objeto que corresponde a la columna actual (columna - 1 para el índice)
+            objetosSeleccionados.push(columna);
+
+            // Restamos el peso del objeto seleccionado de la capacidad actual
+            capacidad -= objetos[columna - 1].peso; // Obtenemos el peso desde el array de objetos
+        } else {
+            // Si no hubo cambio en el valor, retrocedemos una fila
+            capacidad--;
+        }
+    }
+
+    // Devolvemos los objetos seleccionados en orden inverso
+    return objetosSeleccionados.reverse();
+}
+
+
+    
 
     const cargarArchivo = () => {
         const input = document.createElement('input');
@@ -206,9 +242,9 @@ const Mochila = () => {
                                                     <tr key={i}>
                                                         <td>{i}</td>
                                                         {fila.map((valor, j) => {
-                                                            const isItemUsed = j > 0 && valor !== matrizSolucion[i][j - 1];
+                                                            const isItemUsed = valor !== matrizSolucion[i][j - 1] && valor!==0;
                                                             return (
-                                                                <td key={j} style={{ color: isItemUsed ? 'red' : 'black' }}>
+                                                                <td key={j} style={{ color: isItemUsed ? 'green' : 'red' }}>
                                                                     {valor}
                                                                 </td>
                                                             );

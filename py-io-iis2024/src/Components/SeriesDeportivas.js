@@ -5,11 +5,12 @@ function SeriesDeportivas() {
 
     const [matrizPartidos, setMatrizPartidos] = useState([]);
     const [formValues, setFormValues] = useState({
-        probabilidadGanarCasaA: '',
-        probabilidadGanarVisitaA: '',
-        numeroMaximoPartidos: '',
+        probabilidadGanarCasaA: '0.5',
+        probabilidadGanarVisitaA: '0.5',
+        numeroMaximoPartidos: '1',
         distribucionPartidos: []
     });
+
     const [valoresOperacion, setValoresOperacion] = useState({});
     const [errores, setErrores] = useState({});
 
@@ -61,8 +62,12 @@ function SeriesDeportivas() {
     };
 
     const renderDistribucionPartidos = () => {
+        if (formValues.numeroMaximoPartidos === '') return null;
+        if (formValues.numeroMaximoPartidos < 1) return null;
+        if (formValues.numeroMaximoPartidos > 11) return null;
         return Array.from({ length: formValues.numeroMaximoPartidos }, (_, index) => (
             <button
+
                 key={index}
                 type="button"
                 className={formValues.distribucionPartidos[index] === 'A' ? 'juegaLocal' : 'juegaVisita'}
@@ -87,7 +92,8 @@ function SeriesDeportivas() {
                 pr: formValues.probabilidadGanarVisitaA,
                 qh: 1 - formValues.probabilidadGanarVisitaA,
                 n: Math.ceil(formValues.numeroMaximoPartidos / 2) + 1,
-                distribucion: formValues.distribucionPartidos
+                distribucion: formValues.distribucionPartidos,
+                distribucionPartidosCalc: formValues.distribucionPartidos
             });
 
 
@@ -104,41 +110,64 @@ function SeriesDeportivas() {
         }
     }, [valoresOperacion]);
 
-    const test = () => {
-        console.log("test");
-    }
 
     const guardar = () => {
         //guarda el estado actual en un archivo txt
         const textoDatosFormulario = JSON.stringify(formValues);
         const textoMatrizPartidos = JSON.stringify(matrizPartidos);
-        
+
         const documento = document.createElement("a");
-        const file = new Blob([textoDatosFormulario + '\n' + textoMatrizPartidos ], { type: 'text/plain' });
+        const file = new Blob([textoDatosFormulario + '\n' + textoMatrizPartidos], { type: 'text/plain' });
         documento.href = URL.createObjectURL(file);
         documento.download = "seriesDeportivas.txt";
-        document.body.appendChild(documento); // Required for this to work in FireFox
+        document.body.appendChild(documento); 
         documento.click();
     }
 
-    const cargarDatos = () => {
-        //carga el estado guardado de un archivo txt
+        const cargarDatos = () => {
         const input = document.createElement('input');
         input.type = 'file';
+        input.accept = '.txt'; 
+    
         input.onchange = e => {
             const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.readAsText(file, 'UTF-8');
-            reader.onload = readerEvent => {
-                const content = readerEvent.target.result;
-                const datos = content.split('\n');
-                setFormValues(JSON.parse(datos[0]));
-                setMatrizPartidos(JSON.parse(datos[1]));
+            if (file && file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.readAsText(file, 'UTF-8');
+                reader.onload = readerEvent => {
+                    try {
+                        const content = readerEvent.target.result;
+                        const datos = content.split('\n');
+                        if (datos.length >= 2) {
+                            const formValues = JSON.parse(datos[0]);
+                            const matrizPartidos = JSON.parse(datos[1]);
+                            if (validateFormValues(formValues) && validateMatrizPartidos(matrizPartidos)) {
+                                setFormValues(formValues);
+                                setMatrizPartidos(matrizPartidos);
+                            } else {
+                                alert('El contenido del archivo no es válido.');
+                            }
+                        } else {
+                            alert('El archivo no contiene los datos esperados.');
+                        }
+                    } catch (error) {
+                        alert('Error al leer el archivo: ' + error.message);
+                    }
+                };
+            } else {
+                alert('Por favor, seleccione un archivo de texto válido.');
             }
-        }
+        };
         input.click();
-
-    }
+    };
+    
+    const validateFormValues = (formValues) => {
+        return typeof formValues === 'object' && formValues !== null;
+    };
+    
+    const validateMatrizPartidos = (matrizPartidos) => {
+        return Array.isArray(matrizPartidos);
+    };
 
     const validateForm = () => {
         let valido = true;
@@ -173,77 +202,79 @@ function SeriesDeportivas() {
 
 
     return (
-        <div>
+        <div className="seriesDeportivas">
             <h1>Series Deportivas</h1>
-
-            <div>
+            <div className="container">
                 <form className="form-a" onSubmit={handleSubmit}>
-                    <div>
-
-                        <label>
-                            Probabilidad de ganar en casa A:
-                        </label>
-                        <input
-                            type="number"
-                            value={formValues.probabilidadGanarCasaA}
-                            onChange={handleChageForm}
-                            name="probabilidadGanarCasaA"
-                            min={0}
-                            max={1}
-                            step={0.0001}
-                        />
-                        <div className="error">{errores.probabilidadGanarCasaA}</div>
+                    <div className="row">
+                        <div className="form-group">
+                            <label className="label">
+                                Probabilidad de ganar en casa A:
+                            </label>
+                            <input
+                                className="input"
+                                type="number"
+                                value={formValues.probabilidadGanarCasaA}
+                                onChange={handleChageForm}
+                                name="probabilidadGanarCasaA"
+                                min={0}
+                                max={1}
+                                step={0.0001}
+                            />
+                            <div className="error">{errores.probabilidadGanarCasaA}</div>
+                        </div>
+                        <div className="form-group">
+                            <label className="label">
+                                Probabilidad de ganar en casa B:
+                            </label>
+                            <input
+                                className="input"
+                                type="number"
+                                value={formValues.probabilidadGanarVisitaA}
+                                onChange={handleChageForm}
+                                name="probabilidadGanarVisitaA"
+                                min={0}
+                                max={1}
+                                step={0.0001}
+                            />
+                            <div className="error">{errores.probabilidadGanarVisitaA}</div>
+                        </div>
+                        <div className="form-group">
+                            <label className="label">
+                                Número máximo de partidos:
+                            </label>
+                            <input
+                                className="input"
+                                type="number"
+                                value={formValues.numeroMaximoPartidos}
+                                onChange={handleChageForm}
+                                name="numeroMaximoPartidos"
+                                min={1}
+                                max={11}
+                                step={1}
+                            />
+                            <div className="error">{errores.numeroMaximoPartidos}</div>
+                        </div>
                     </div>
-                    <div>
-                        <label>
-                            Probabilidad de ganar en casa B:
-                        </label>
-                        <input
-                            type="number"
-                            value={formValues.probabilidadGanarVisitaA}
-                            onChange={handleChageForm}
-                            name="probabilidadGanarVisitaA"
-                            min={0}
-                            max={1}
-                            step={0.0001}
-                        />
-                        <div className="error">{errores.probabilidadGanarVisitaA}</div>
+                    <div className="row">
+                        <div className="form-group">
+                            <label>Distribución de partidos:</label>
+                            <div className="distribucionPartidos">
+                                {renderDistribucionPartidos()}
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label>
-                            Número máximo de partidos:
-                        </label>
-                        <input
-                            type="number"
-                            value={formValues.numeroMaximoPartidos}
-                            onChange={handleChageForm}
-                            name="numeroMaximoPartidos"
-                            min={1}
-                            max={11}
-                            step={1}
-                        />
-                        <div className="error">{errores.numeroMaximoPartidos}</div>
-                    </div>
-                    <div>
-                        <label>Distribución de partidos:</label>
-                        {renderDistribucionPartidos()}
-                    </div>
-                    <div>
                         <div className="error">{errores.general}</div>
+                    
+                    <div className="button-group-sd">
+                        <button className="primary-button" type="submit">Calcular solución</button>
+                        <button className="primary-button" onClick={guardar}>Guardar</button>
+                        <button className="primary-button" onClick={cargarDatos}>Cargar desde archivo</button>
                     </div>
-
-                    <button type="submit">Generar</button>
-
-
-
-
                 </form>
-                <div>
-                    <button onClick={guardar}>guardar</button>
-                    <button onClick={cargarDatos}>cargar</button>
-                </div>
-                <table>
-                    <thead>
+
+                <table className="table">
+                    <thead className="thead">
                         <tr>
                             <th></th>
                             {Array.from({ length: valoresOperacion.n }, (_, i) => (
@@ -254,15 +285,13 @@ function SeriesDeportivas() {
                     <tbody>
                         {matrizPartidos.map((row, rowIndex) => (
                             <tr key={rowIndex}>
-                                <th
-
-                                >{rowIndex}</th>
+                                <th>{rowIndex}</th>
                                 {row.map((cell, cellIndex) => (
                                     console.log(cellIndex),
                                     <td
                                         className={
                                             cellIndex === 0 || rowIndex == 0 ? 'celdaIndice' :
-                                                formValues.distribucionPartidos[cellIndex - 2 + rowIndex] === 'A' ? 'juegaLocal' : 'juegaVisita'}
+                                                valoresOperacion.distribucionPartidosCalc[cellIndex - 2 + rowIndex] === 'A' ? 'celdaLocal' : 'celdaVisita'}
 
                                         key={cellIndex}>{cell}</td>
                                 ))}
