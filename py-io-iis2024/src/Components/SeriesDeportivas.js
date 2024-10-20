@@ -280,7 +280,9 @@ function SeriesDeportivas() {
                     <div className="button-group-sd">
                         <button className="primary-button" onClick={guardar}>Guardar configuración</button>
                         <button className="primary-button" onClick={cargarDatos}>Cargar desde archivo</button>
-                        <button className="primary-button" type="submit">Calcular solución</button>
+                        <button
+                            style={{marginLeft: 'auto'}}
+                            className="primary-button" type="submit">Calcular solución</button>
                         {errores.cargarDatos && <div className="error">*{errores.cargarDatos}</div>}
                     </div>
                 </form>
