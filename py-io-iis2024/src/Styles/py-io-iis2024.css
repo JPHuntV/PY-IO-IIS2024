@@ -38,7 +38,7 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 0;
-  margin-top: 50px;
+  margin-top: 80px;
 }
 
 .button-group {
@@ -96,40 +96,6 @@ body {
   
 }
 
-.form-group {
-  display: flex;
-  flex: 1;
-  padding: 15px;
-  flex-direction: column;
-
-}
-
-.distribucionPartidos {
-  flex-direction: row !important;
-  width: 60%;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-evenly;
-  padding: 15px;
-  box-sizing: border-box;
-
-  
-}
-
-.form-group label {
-  display: block;
-  font-weight: bold;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0;
-  border: 1px solid #e7e7e7;
-  box-sizing: border-box;
-
-}
-
 .juegaLocal {
   background-color: #ffffff;
   border-radius: 100px;
@@ -148,7 +114,149 @@ body {
   color: #ff0000;
   }
 
-.celdaLocal {
+  .distribucionPartidos {
+    flex-direction: row !important;
+    width: 60%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 15px;
+    box-sizing: border-box;
+  }
+  
+/*Mochila*/
+.mochila {
+  width: 100%;
+}
+
+.table input {
+  width: auto;
+  padding: 10px;
+  border: 1px solid #e7e7e7;
+  box-sizing: border-box;
+}
+
+
+/*Arboles binarios*/
+.button-group-bst {
+  display: flex;
+  margin-bottom: 0;
+  z-index: 1;
+  position: relative;
+  padding: 10px;
+  
+}
+
+.matrices-bst {
+  width: 100%;
+  border: 1px solid green;
+  
+}
+
+/*rutas mas cortas*/
+
+.tablaRutas-container {
+  width: 100%;
+  overflow-x: auto;  
+  border: 1px solid red;
+}
+
+
+
+.tablaD0 input[type="text"], input[type="number"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+
+
+.tablas-resultados {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.tablasD, .tablasP{
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-top: 10px;
+}
+
+.nodo-ruta {
+  border: 2px solid #45a049;
+  color: #45a049;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.flecha {
+  color: #45a049;
+  font-size: 20px;
+}
+
+.ruta-mas-corta {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+/**************************/
+.form-group {
+  display: flex;
+  flex: 1;
+  padding:10px;
+  flex-direction: column;
+
+}
+
+.mock-input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 0 !important;
+  box-sizing: border-box;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #e7e7e7;
+  box-sizing: border-box;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #e7e7e7;
+  box-sizing: border-box;
+}
+
+option {
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #e7e7e7;
+  box-sizing: border-box;
+  
+  
+}
+
+.celdaVerde {
   background-color: #4CAF50;
   color: #ffffff;
   border: 1px solid #e7e7e7;
@@ -157,7 +265,7 @@ body {
   margin: 10px 0;
 }
 
-.celdaVisita {
+.celdaRoja {
   background-color: #ff0000;
   color: #ffffff;
   border: 1px solid #e7e7e7;
@@ -174,13 +282,25 @@ body {
   margin: 10px 0;
 }
 
+.delete-button {
+  background: none;
+  border: none;
+  color: gray;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 5px;
+  transition: color 0.3s ease;
+}
 
-/**************************/
+.delete-button:hover {
+  color: darkred;
+}
 
 .row {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  align-items: center;
 
 }
 
@@ -211,11 +331,18 @@ body {
   border-radius: 5px;
 }
 
+.table-container {
+  overflow-x: auto; 
+  margin-top: 20px;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   border-radius: 5px;
+  justify-content: center;
+  box-sizing: border-box;
 }
 .table th, .table td {
   border: 1px solid #e7e7e7;
@@ -226,4 +353,11 @@ body {
 .table th {
   background-color: #f2f2f2;
   text-align: center;
+}
+
+.descripcion-problema {
+  margin-top: 20px;
+  padding: 10px;
+  color: rgba(0, 0, 0, 0.7);
+  border-bottom: 1px solid #45a04981
 }

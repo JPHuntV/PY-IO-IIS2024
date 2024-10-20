@@ -120,15 +120,17 @@ function SeriesDeportivas() {
         const file = new Blob([textoDatosFormulario + '\n' + textoMatrizPartidos], { type: 'text/plain' });
         documento.href = URL.createObjectURL(file);
         documento.download = "seriesDeportivas.txt";
-        document.body.appendChild(documento); 
+        document.body.appendChild(documento);
         documento.click();
     }
 
-        const cargarDatos = () => {
+    const cargarDatos = (e) => {
+        e.preventDefault();
+        errores.cargarDatos = null;
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.txt'; 
-    
+        input.accept = '.txt';
+
         input.onchange = e => {
             const file = e.target.files[0];
             if (file && file.type === 'text/plain') {
@@ -143,28 +145,30 @@ function SeriesDeportivas() {
                             const matrizPartidos = JSON.parse(datos[1]);
                             if (validateFormValues(formValues) && validateMatrizPartidos(matrizPartidos)) {
                                 setFormValues(formValues);
-                                setMatrizPartidos(matrizPartidos);
+                                //setMatrizPartidos(matrizPartidos);
                             } else {
-                                alert('El contenido del archivo no es válido.');
+                                errores.cargarDatos = 'El archivo no contiene los datos esperados.';
                             }
                         } else {
-                            alert('El archivo no contiene los datos esperados.');
+                            errores.cargarDatos = 'El archivo no contiene los datos esperados.';
                         }
                     } catch (error) {
-                        alert('Error al leer el archivo: ' + error.message);
+                        errores.cargarDatos = 'El archivo no contiene los datos esperados.';
                     }
                 };
             } else {
-                alert('Por favor, seleccione un archivo de texto válido.');
+                errores.cargarDatos = 'El archivo no es válido.';
             }
         };
+        setErrores(errores);
         input.click();
+
     };
-    
+
     const validateFormValues = (formValues) => {
         return typeof formValues === 'object' && formValues !== null;
     };
-    
+
     const validateMatrizPartidos = (matrizPartidos) => {
         return Array.isArray(matrizPartidos);
     };
@@ -173,7 +177,7 @@ function SeriesDeportivas() {
         let valido = true;
         let errores = {};
         if (formValues.probabilidadGanarCasaA === '' || formValues.probabilidadGanarVisitaA === '' || formValues.numeroMaximoPartidos === '') {
-            errores.general = 'Todos los campos son obligatorios';
+            errores.general = '*Todos los campos son obligatorios';
             valido = false;
         }
         if (formValues.probabilidadGanarCasaA < 0 || formValues.probabilidadGanarCasaA > 1) {
@@ -204,6 +208,11 @@ function SeriesDeportivas() {
     return (
         <div className="seriesDeportivas">
             <h1>Series Deportivas</h1>
+            <p className="descripcion-problema" >Este programa resuelve el problema de las series deportivas,
+                en el cual se busca determinar la probabilidad de que un equipo A
+                gane una serie de partidos contra un equipo B.
+                El programa mostrará una tabla con la probabilidad de que el
+                equipo A gane la serie en función del número de partidos jugados.</p>
             <div className="container">
                 <form className="form-a" onSubmit={handleSubmit}>
                     <div className="row">
@@ -225,7 +234,7 @@ function SeriesDeportivas() {
                         </div>
                         <div className="form-group">
                             <label className="label">
-                                Probabilidad de ganar en casa B:
+                                Probabilidad de ganar de visita A:
                             </label>
                             <input
                                 className="input"
@@ -252,8 +261,10 @@ function SeriesDeportivas() {
                                 min={1}
                                 max={11}
                                 step={1}
+                                placeholder="Ingrese un número entre 1 y 11"
+                                aria-describedby="errorNumeroMaximoPartidos"
                             />
-                            <div className="error">{errores.numeroMaximoPartidos}</div>
+                            <div id="errorNumeroMaximoPartidos" className="error">{errores.numeroMaximoPartidos}</div>
                         </div>
                     </div>
                     <div className="row">
@@ -264,41 +275,48 @@ function SeriesDeportivas() {
                             </div>
                         </div>
                     </div>
-                        <div className="error">{errores.general}</div>
-                    
+                    <div className="error">{errores.general}</div>
+
                     <div className="button-group-sd">
-                        <button className="primary-button" type="submit">Calcular solución</button>
-                        <button className="primary-button" onClick={guardar}>Guardar</button>
+                        <button className="primary-button" onClick={guardar}>Guardar configuración</button>
                         <button className="primary-button" onClick={cargarDatos}>Cargar desde archivo</button>
+                        <button className="primary-button" type="submit">Calcular solución</button>
+                        {errores.cargarDatos && <div className="error">*{errores.cargarDatos}</div>}
                     </div>
                 </form>
 
-                <table className="table">
-                    <thead className="thead">
-                        <tr>
-                            <th></th>
-                            {Array.from({ length: valoresOperacion.n }, (_, i) => (
-                                <th key={i}>{i}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {matrizPartidos.map((row, rowIndex) => (
-                            <tr key={rowIndex}>
-                                <th>{rowIndex}</th>
-                                {row.map((cell, cellIndex) => (
-                                    console.log(cellIndex),
-                                    <td
-                                        className={
-                                            cellIndex === 0 || rowIndex == 0 ? 'celdaIndice' :
-                                                valoresOperacion.distribucionPartidosCalc[cellIndex - 2 + rowIndex] === 'A' ? 'celdaLocal' : 'celdaVisita'}
+                {matrizPartidos.length > 0 && (
+                    <div className="resultados">
+                        <table className="table">
+                            <thead className="thead">
+                                <tr>
+                                    <th></th>
+                                    {Array.from({ length: valoresOperacion.n }, (_, i) => (
+                                        <th key={i}>{i}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {matrizPartidos.map((row, rowIndex) => (
+                                    <tr key={rowIndex}>
+                                        <th>{rowIndex}</th>
+                                        {row.map((cell, cellIndex) => (
+                                            console.log(cellIndex),
+                                            <td
+                                                className={
+                                                    cellIndex === 0 || rowIndex == 0 ? 'celdaIndice' :
+                                                        valoresOperacion.distribucionPartidosCalc[cellIndex - 2 + rowIndex] === 'A' ? 'celdaVerde' : 'celdaRoja'}
 
-                                        key={cellIndex}>{cell}</td>
+                                                key={cellIndex}>{cell}</td>
+                                        ))}
+                                    </tr>
                                 ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                            </tbody>
+                        </table>
+                        <h3>Probabilidad de ganar la serie: {matrizPartidos[valoresOperacion.n - 1][valoresOperacion.n - 1]}</h3>
+                    </div>
+
+                )}
             </div>
         </div>
     );
