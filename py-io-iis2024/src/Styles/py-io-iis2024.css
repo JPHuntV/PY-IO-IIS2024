@@ -153,6 +153,38 @@ body {
   
 }
 
+
+.tree-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  height: 500px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+}
+
+.node__root > circle {
+  fill: #45a049;
+  stroke: white;
+  stroke-width: 3px;
+}
+
+.node__branch > circle {
+  fill: white;
+  stroke: #45a049;
+}
+
+.node__leaf > circle {
+  fill: green;
+}
+
+.rd3t-link {
+  fill: none;
+  stroke: #45a049;
+  stroke-width: 2px;
+}
+
 /*rutas mas cortas*/
 
 .tablaRutas-container {
@@ -367,4 +399,6 @@ option {
   border: none !important;
   text-align: center !important;
 }
+
+
 
