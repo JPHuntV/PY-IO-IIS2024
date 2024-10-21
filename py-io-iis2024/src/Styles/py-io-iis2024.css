@@ -138,7 +138,7 @@ body {
 
 
 /*Arboles binarios*/
-.button-group-bst, .button-group-mo, .button-group-avl, .button-group-sd {
+.button-group-bst, .button-group-mo, .button-group-avl, .button-group-sd , .button-group-rutas {
   display: flex;
   margin-bottom: 0;
   z-index: 1;

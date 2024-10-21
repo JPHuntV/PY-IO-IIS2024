@@ -1,5 +1,6 @@
-import React from "react";
+import React, { act } from "react";
 import { useState, useEffect } from "react";
+import GraphComponent from "./GraphComponent";
 
 function RutasMasCortas() {
     const [rutas, setRutas] = useState([]);
@@ -27,6 +28,8 @@ function RutasMasCortas() {
         inicializarNodos();
         if (archivo === null) {
             inicializarRutas();
+        }else{
+            actualizarRutas(archivo);
         }
     }, [cantidadNodos]);
 
@@ -69,69 +72,37 @@ function RutasMasCortas() {
     }
 
 
-        const cargarArchivo = () => {
-        limpiar();
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.onchange = e => {
-            setArchivo(e.target.files[0]);
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const tablasArchivo = e.target.result.split('\n\n').map(tabla => tabla.trim());
-                console.log("tablas", tablasArchivo);
-                const tablasD = tablasArchivo[0].split('\n\n').map(tabla => tabla.trim());
-                const tablaD0 = tablasD[0].split('\n').map(fila => fila.split(',').map(valor => valor.trim()));
-        
-                tablaD0.shift();
-                setCantidadNodos(tablaD0.length);
-                setRutas(tablaD0);
-            
-                console.log("tablaD0", tablaD0);
-
-                
-            };
-            reader.readAsText(file);
-        }
-        input.click();
-    }
-
     const guardarArchivo = () => {
-        const tablasDString = tablasD.map((tablaD, index) => {
-            let tablaDString = `k = ${index}\n`;
-            for (let i = 0; i < cantidadNodos; i++) {
-                for (let j = 0; j < cantidadNodos; j++) {
-                    tablaDString += `${tablasD[index][i][j]},`;
-                }
-                tablaDString = tablaDString.slice(0, -1);
-                tablaDString += "\n";
-            }
-            return tablaDString;
-        }).join("\n");
-        const tablasPString = tablasP.map((tablaP, index) => {
-            let tablaPString = `p = ${index}\n`;
-            for (let i = 0; i < cantidadNodos; i++) {
-                for (let j = 0; j < cantidadNodos; j++) {
-                    tablaPString += `${tablasP[index][i][j]},`;
-                }
-                tablaPString = tablaPString.slice(0, -1);
-                tablaPString += "\n";
-            }
-            return tablaPString;
-        }
-        ).join("\n");
-        const contenido = `${tablasDString}\n${tablasPString}`;
+        //save cantidadNodos, rutas as JSON to txt file
+        const contenido = JSON.stringify(rutas);
         const blob = new Blob([contenido], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = 'rutas_mas_cortas.txt';
+        a.download = "rutas_mas_cortas.txt";
         a.click();
-
-
 
     }
 
+    const cargarArchivo = (e) => {
+        e.preventDefault();
+        const file = document.createElement("input");
+        file.setAttribute("type", "file");
+        file.setAttribute("accept", ".txt");
+        file.onchange = (e) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const contenido = e.target.result;
+                const rutas = JSON.parse(contenido);
+                const cantidadNodos = rutas.length;
+                setCantidadNodos(cantidadNodos);
+                setRutas(rutas);
+                setArchivo(rutas);
+            }
+            reader.readAsText(e.target.files[0]);
+        }
+        file.click();
+    }
 
     const inicializarRutas = () => {
         let rutas = [];
@@ -150,10 +121,31 @@ function RutasMasCortas() {
 
     }
 
+    const actualizarRutas = (rutas) => {
+        //añadir rutas a la matriz ya existente que tiene cantidadNodos
+        let rutasNuevas = [];
+        for (let i = 1; i <= cantidadNodos; i++) {
+            let ruta = [];
+            for (let j = 1; j <= cantidadNodos; j++) {
+                if (i === j) {
+                    ruta.push(0);
+                } else if (i <= rutas.length && j <= rutas.length) {
+                    ruta.push(rutas[i - 1][j - 1]);
+                } else {
+                    ruta.push("X");
+                }
+            }
+            rutasNuevas.push(ruta);
+        }
+        setRutas(rutasNuevas);
+    }
+
     const limpiar = () => {
-        inicializarRutas();
         setTablasD([]);
         setTablasP([]);
+        setTablasDResultados([]);
+        setTablasPResultados([]);
+        setMostrarRutaMasCorta("");
     }
 
     const handleInputChange = (row, col, value) => {
@@ -200,6 +192,7 @@ function RutasMasCortas() {
 
 
 
+
         for (let k = 1; k <= cantidadNodos; k++) {
             let tablaD = [];
             let tablaP = [];
@@ -213,8 +206,8 @@ function RutasMasCortas() {
                         : parseInt(tablasD[k - 1][i][k - 1], 10) + parseInt(tablasD[k - 1][k - 1][j], 10);
 
                     if (d1 === Infinity && d2 === Infinity) {
-                        filaD.push("X");
-                        filaP.push("X");
+                        filaD.push("∞");
+                        filaP.push("∞");
                     } else if (d1 === Infinity) {
                         filaD.push(d2);
                         filaP.push(k);
@@ -247,99 +240,108 @@ function RutasMasCortas() {
     const renderizarTablasD = () => {
         return (
             tablasD.map((tablaD, index) => (
-            <div key={index}>
-                <h3>k = {index}</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            {nodos.map((nodo) => (
-                                <th key={nodo}>
-                                    <input type="text" value={nombresPorDefecto[nodo - 1]} disabled />
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {nodos.map((nodo) => (
-                            <tr key={nodo}>
-                                <td>
-                                    <input type="text" value={nombresPorDefecto[nodo - 1]} disabled />
-                                </td>
-                                {nodos.map((nodo2) => {
-                                    const esInfinito = tablaD[nodo - 1][nodo2 - 1] === "X";
-                                    return (
-                                        <td key={nodo2}>
-                                            <input
-                                                type="text"
-                                                value={esInfinito ? "X" : tablaD[nodo - 1][nodo2 - 1]}
-                                                disabled
-                                            />
-                                        </td>
-                                    );
-                                })}
+                <div key={index} className="table-container">
+                    <h3>K = {index}</h3>
+                    <table className="table">
+                        <thead className="thead">
+                            <tr>
+                                <th></th>
+                                {nodos.map((nodo) => (
+                                    <th key={nodo}>
+                                        <p>{nombresPorDefecto[nodo - 1]}</p>
+                                    </th>
+                                ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        ))
-        )    
-    }
-    
-    const renderizarTablasP = () => {
-        return (
-            tablasP.map((tablaP, index) => (
-            <div key={index}>
-                <h3>k = {index}</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th></th>
+                        </thead>
+                        <tbody>
                             {nodos.map((nodo) => (
-                                <th key={nodo}>
-                                    <input type="text" value={nombresPorDefecto[nodo - 1]} disabled />
-                                </th>
+                                <tr key={nodo}>
+                                    <td>
+                                        <p>{nombresPorDefecto[nodo - 1]}</p>
+                                    </td>
+                                    {nodos.map((nodo2) => {
+                                        const esInfinito = tablaD[nodo - 1][nodo2 - 1] === "X";
+                                        return (
+                                            <td key={nodo2}>
+                                                <p>
+                                                    {esInfinito ? "∞" : tablaD[nodo - 1][nodo2 - 1]}
+                                                </p>
+
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
                             ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {nodos.map((nodo) => (
-                            <tr key={nodo}>
-                                <td>
-                                    <input type="text" value={nombresPorDefecto[nodo - 1]} disabled />
-                                </td>
-                                {nodos.map((nodo2) => {
-                                    const esInfinito = tablaP[nodo - 1][nodo2 - 1] === "X";
-                                    return (
-                                        <td key={nodo2}>
-                                            <input
-                                                type="text"
-                                                value={esInfinito ? "X" : tablaP[nodo - 1][nodo2 - 1]}
-                                                disabled
-                                            />
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        ))
+                        </tbody>
+                    </table>
+                </div>
+            ))
         )
     }
 
+    const renderizarTablasP = () => {
+        return (
+            tablasP.map((tablaP, index) => (
+                <div key={index} className="table-container">
+                    <h3>P = {index}</h3>
+                    <table className="table">
+                        <thead className="thead">
+                            <tr>
+                                <th></th>
+                                {nodos.map((nodo) => (
+                                    <th key={nodo}>
+                                        <p>{nombresPorDefecto[nodo - 1]}</p>
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {nodos.map((nodo) => (
+                                <tr key={nodo}>
+                                    <td>
+                                        <p>{nombresPorDefecto[nodo - 1]}</p>
+                                    </td>
+                                    {nodos.map((nodo2) => {
+                                        const esInfinito = tablaP[nodo - 1][nodo2 - 1] === "X";
+                                        return (
+                                            <td key={nodo2}>
+                                                <p>
+                                                    {esInfinito ? "∞" : tablaP[nodo - 1][nodo2 - 1]}
+                                                </p>
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            ))
+        )
+    }
+
+    const handleNombreNodoChange = (index, value) => {
+        setNombresPorDefecto((prev) => {
+            const newNombres = [...prev];
+            newNombres[index] = value;
+            return newNombres;
+        });
+    };
 
     const generarTablaD0 = () => {
         return (
-            <table>
-                <thead>
+            <table className="table tablaD0">
+                <thead className="thead">
                     <tr>
                         <th></th>
                         {nodos.map((nodo) => (
                             <th key={nodo}>
-                                <input type="text" value={nombresPorDefecto[nodo - 1]} disabled />
+                                <input
+                                    className="input-table"
+                                    type="text" value={nombresPorDefecto[nodo - 1]}
+                                    onChange={(e) => handleNombreNodoChange(nodo - 1, e.target.value)}
+
+                                />
 
                             </th>
                         ))}
@@ -349,13 +351,18 @@ function RutasMasCortas() {
                     {nodos.map((nodo) => (
                         <tr key={nodo}>
                             <td>
-                                <input type="text" value={nombresPorDefecto[nodo - 1]} disabled />
+                                <input
+                                    className="input-table"
+                                    type="text" value={nombresPorDefecto[nodo - 1]}
+                                    onChange={(e) => handleNombreNodoChange(nodo - 1, e.target.value)}
+                                />
                             </td>
                             {nodos.map((nodo2) => {
                                 const esInfinito = rutas[nodo - 1][nodo2 - 1] === "X";
                                 return (
                                     <td key={nodo2}>
                                         <input
+                                            className="input-table"
                                             type="number"
                                             value={esInfinito ? "" : rutas[nodo - 1][nodo2 - 1]}
                                             disabled={esInfinito}
@@ -367,7 +374,7 @@ function RutasMasCortas() {
                                                 checked={esInfinito || false}
                                                 onChange={() => handleCheckboxChange(nodo, nodo2)}
                                             />
-                                            Infinite
+                                            Infinito
                                         </label>
                                     </td>
                                 );
@@ -379,7 +386,8 @@ function RutasMasCortas() {
         );
     }
 
-    const calcularRutaMasCorta = () => {
+    const calcularRutaMasCorta = (e) => {
+        e.preventDefault();
         const nodoOrigen = parseInt(document.getElementById("nodoOrigen").value, 10);
         const nodoDestino = parseInt(document.getElementById("nodoDestino").value, 10);
         let rutaMasCorta = "";
@@ -387,7 +395,7 @@ function RutasMasCortas() {
         if (tablasP.length === 0) {
             return;
         } else {
-            if(nodoOrigen === nodoDestino) {
+            if (nodoOrigen === nodoDestino) {
                 rutaMasCorta = "No hay ruta";
             } else if (tablasP[k][nodoOrigen - 1][nodoDestino - 1] === "X") {
                 rutaMasCorta = "No hay ruta";
@@ -405,10 +413,37 @@ function RutasMasCortas() {
         setMostrarRutaMasCorta(rutaMasCorta);
     }
 
+
+    const renderRutaMasCorta = () => {
+        let ruta = mostrarRutaMasCorta.split(" -> ");
+        console.log("ruta", ruta);
+        let rutaRenderizada = [];
+        for (let i = 0; i < ruta.length; i++) {
+
+            if (i === 0) {
+                if (ruta[i] === "No hay ruta") {
+                    rutaRenderizada.push(<span className="flecha" key={i}>{ruta[i]}</span>);
+                } else {
+                    rutaRenderizada.push(<span className="nodo-ruta" key={i}>{nombresPorDefecto[ruta[i] - 1]}</span>);
+                }
+            } else {
+                rutaRenderizada.push(<span className="flecha" key={i}> {"->"} </span>);
+                rutaRenderizada.push(<span className="nodo-ruta" key={i}>  {nombresPorDefecto[ruta[i] - 1]}</span>);
+            }
+        }
+        return rutaRenderizada;
+    }
+
+
+    
+
     return (
-        <div>
+        <div className="rutas-mas-cortas">
             <h1>Rutas más cortas</h1>
-            <div>
+            <p className='descripcion-problema'> 
+                Dada una red de transporte con n nodos, se desea encontrar la ruta más corta entre dos nodos. 
+                Para ello, se debe calcular la matriz de rutas más cortas D</p>
+                <div className="form-group">
                 <label htmlFor="cantidadNodos">Cantidad de nodos</label>
                 <input
                     type="number"
@@ -418,33 +453,53 @@ function RutasMasCortas() {
                     max={10}
 
                 />
-                {errores.cantidadNodos && <p>{errores.cantidadNodos}</p>}
+                {errores.cantidadNodos && <p className="error" >*{errores.cantidadNodos}</p>}
             </div>
-            <div>
-                <button onClick={cargarArchivo}>Cargar archivo</button>
-                <button onClick={limpiar}>Limpiar</button>
+            
+            <div className="table-container">
+                {generarTablaD0()}
+            </div>
+            <div className="grafico-rutas">
+                {console.log("rutas", rutas)}
+                <GraphComponent 
+                    matrix={rutas}
+                    nodeNames={nombresPorDefecto} 
+                />
+            </div>
+            <div className="button-group-rutas">
+                <button className="primary-button" onClick={cargarArchivo}>Cargar archivo</button>
+                <button className="primary-button" onClick={guardarArchivo}>Guardar archivo</button>
+
+                <button className="primary-button" onClick={limpiar}>Limpiar</button>
                 <button
+                style={{marginLeft: 'auto'}}
+                className="primary-button" 
                     onClick={calcularRutasMasCortas}
                 >Calcular</button>
             </div>
-            <div>
-                {generarTablaD0()}
-            </div>
-            <div className="tablasResultados">
-                <h2>Tablas D</h2>
-                {tablasDResultados}
-                <h2>Tablas P</h2>
-                {tablasPResultados}
+            <div className="tablas-resultados">
+                <div className="tablasD">
+                    {tablasDResultados.length > 0 && <h2>Tablas D</h2>}
+
+                    {tablasDResultados}
                 </div>
-                <div className="calcularRutasCortas">
-                    <h2>Calcular rutas más cortas entre 2 nodos</h2>
-                    <div>
+                <div className="tablasP">
+                    {tablasDResultados.length > 0 && <h2>Tablas P</h2>}
+                    {tablasPResultados}
+                </div>
+            </div>
+            <div className="calcularRutasCortas">
+                <h2>Calcular rutas más cortas entre 2 nodos</h2>
+                <div className="row">
+                    <div className="form-group">
                         <label htmlFor="nodoOrigen">Nodo origen</label>
                         <select name="nodoOrigen" id="nodoOrigen">
                             {nodos.map((nodo) => (
                                 <option key={nodo} value={nodo}>{nombresPorDefecto[nodo - 1]}</option>
                             ))}
                         </select>
+                    </div>
+                    <div className="form-group">
 
                         <label htmlFor="nodoDestino">Nodo destino</label>
                         <select name="nodoDestino" id="nodoDestino">
@@ -452,21 +507,22 @@ function RutasMasCortas() {
                                 <option key={nodo} value={nodo}>{nombresPorDefecto[nodo - 1]}</option>
                             ))}
                         </select>
+                    </div>
+                    <button className="primary-button" onClick={calcularRutaMasCorta} >Calcular</button>
+                </div>
+                {mostrarRutaMasCorta.length > 0 &&
+                    <div className="ruta-mas-corta">
+                        <label>Ruta más corta:</label>
+                        {renderRutaMasCorta()}
+                    </div>}
 
-                        <button onClick={calcularRutaMasCorta} >Calcular</button>
-                        {mostrarRutaMasCorta && <p>Ruta más corta: {mostrarRutaMasCorta}</p>}
-                        </div>
 
 
-                
-
-        </div>
-        <div>
-            <button onClick={guardarArchivo}>Guardar archivo</button>
             </div>
-                
+
+
         </div>
-        
+
     );
 
 }
