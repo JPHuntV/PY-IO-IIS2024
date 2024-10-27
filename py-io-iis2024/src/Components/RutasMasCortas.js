@@ -1,14 +1,15 @@
 import React, { act } from "react";
 import { useState, useEffect } from "react";
-import GraphComponent from "./GraphComponent";
+import GraphComponent from "./GraphComponent"; //importar componente de grafo
 
 function RutasMasCortas() {
-    const [rutas, setRutas] = useState([]);
+    //
+    const [rutas, setRutas] = useState([]); //matriz de rutas
     const [tablaP, setTablaP] = useState([]);
-    const [tablasDResultados, setTablasDResultados] = useState([]);
-    const [tablasPResultados, setTablasPResultados] = useState([]);
+    const [tablasDResultados, setTablasDResultados] = useState([]); //tablas D
+    const [tablasPResultados, setTablasPResultados] = useState([]); //tablas P
     const [mostrarRutaMasCorta, setMostrarRutaMasCorta] = useState("");
-    const [nodos, setNodos] = useState([]);
+    const [nodos, setNodos] = useState([]); //nodos
     const [cantidadNodos, setCantidadNodos] = useState(2);
     const [errores, setErrores] = useState({});
     const [nombresPorDefecto, setNombresPorDefecto] = useState([
@@ -18,44 +19,44 @@ function RutasMasCortas() {
 
     const [tablasD, setTablasD] = useState([]);
     const [tablasP, setTablasP] = useState([]);
+    const [bloquearInputs, setBloquearInputs] = useState(false);
 
+
+    //Inicializar nodos y rutas al cargar el componente
     useEffect(() => {
         inicializarNodos();
         inicializarRutas();
     }, []);
 
+    //Cadavez que cambie la cantidad de nodos, se inicializan los nodos y las rutas
     useEffect(() => {
         inicializarNodos();
         if (archivo === null) {
             inicializarRutas();
-        }else{
-            actualizarRutas(archivo);
         }
     }, [cantidadNodos]);
 
-    useEffect(() => {
-        console.log("rutas", rutas);
-    }, [rutas]);
 
+    //Cada vez que cambiar las tablas D, se renderizan las tablas D
     useEffect(() => {
-        console.log("tablasD", tablasD);
-        console.log("tablasP", tablasP);
         setTablasDResultados(renderizarTablasD());
     }, [tablasD]);
 
+    //Cada vez que cambie la s tablas P, se renderizan las tablas P
     useEffect(() => {
-        console.log("tablasP", tablasP);
         setTablasPResultados(renderizarTablasP());
     }, [tablasP]);
 
+
+    //Manejar el cambio de la cantidad de nodos
     const handleCantidadNodosChange = (event) => {
         if (event.target.value === "") {
             setCantidadNodos("");
             setErrores({});
-        } else if (event.target.value < 2) {
+        } else if (event.target.value < 2) { //validar que la cantidad de nodos sea mayor o igual a 2
             setCantidadNodos(2);
             setErrores({ cantidadNodos: "La cantidad de nodos debe ser mayor o igual a 2" });
-        } else if (event.target.value > 10) {
+        } else if (event.target.value > 10) { //validar que la cantidad de nodos sea menor o igual a 10
             setCantidadNodos(10);
             setErrores({ cantidadNodos: "La cantidad de nodos debe ser menor o igual a 10" });
         } else {
@@ -63,6 +64,7 @@ function RutasMasCortas() {
         }
     }
 
+    //Crea un arreglo con los nodos del grafo
     const inicializarNodos = () => {
         let nodos = [];
         for (let i = 1; i <= cantidadNodos; i++) {
@@ -71,9 +73,8 @@ function RutasMasCortas() {
         setNodos(nodos);
     }
 
-
+    //Guarda el archivo con las rutas más cortas en un archivo .txt
     const guardarArchivo = () => {
-        //save cantidadNodos, rutas as JSON to txt file
         const contenido = JSON.stringify(rutas);
         const blob = new Blob([contenido], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
@@ -84,8 +85,10 @@ function RutasMasCortas() {
 
     }
 
+    //Carga un archivo con las rutas más cortas
     const cargarArchivo = (e) => {
         e.preventDefault();
+        limpiar();
         const file = document.createElement("input");
         file.setAttribute("type", "file");
         file.setAttribute("accept", ".txt");
@@ -104,15 +107,16 @@ function RutasMasCortas() {
         file.click();
     }
 
+    //Inicializa las rutas con valores por defecto
     const inicializarRutas = () => {
         let rutas = [];
         for (let i = 1; i <= cantidadNodos; i++) {
             let ruta = [];
             for (let j = 1; j <= cantidadNodos; j++) {
-                if (i === j) {
+                if (i === j) { //si el nodo origen es igual al nodo destino, la distancia es 0
                     ruta.push(0);
                 } else {
-                    ruta.push("X");
+                    ruta.push("X"); //si no, la distancia es infinito (X)
                 }
             }
             rutas.push(ruta);
@@ -121,33 +125,23 @@ function RutasMasCortas() {
 
     }
 
-    const actualizarRutas = (rutas) => {
-        //añadir rutas a la matriz ya existente que tiene cantidadNodos
-        let rutasNuevas = [];
-        for (let i = 1; i <= cantidadNodos; i++) {
-            let ruta = [];
-            for (let j = 1; j <= cantidadNodos; j++) {
-                if (i === j) {
-                    ruta.push(0);
-                } else if (i <= rutas.length && j <= rutas.length) {
-                    ruta.push(rutas[i - 1][j - 1]);
-                } else {
-                    ruta.push("X");
-                }
-            }
-            rutasNuevas.push(ruta);
-        }
-        setRutas(rutasNuevas);
-    }
 
+    //Limpia los valores de las tablas y los nodos al presionar el botón limpiar
     const limpiar = () => {
         setTablasD([]);
         setTablasP([]);
         setTablasDResultados([]);
         setTablasPResultados([]);
         setMostrarRutaMasCorta("");
+        setArchivo(null);
+        setErrores({});
+        setCantidadNodos(2);
+        setBloquearInputs(false);
+
     }
 
+
+    //Maneja el cambio de los inputs de la matriz de rutas
     const handleInputChange = (row, col, value) => {
         setRutas((prev) => {
             const newRutas = [...prev];
@@ -157,6 +151,7 @@ function RutasMasCortas() {
 
     };
 
+    //Maneja el cambio de los checkbox de la matriz de rutas (si la distancia es infinito)
     const handleCheckboxChange = (row, col) => {
         setRutas((prev) => {
             const newRutas = [...prev];
@@ -166,9 +161,11 @@ function RutasMasCortas() {
     };
 
 
+    //Función para calcular las rutas más cortas
     const calcularRutasMasCortas = () => {
-        let tablasD = [];
-        let tablasP = [];
+        setBloquearInputs(true); //bloquear inputs para que no se puedan modificar
+        let tablasD = []; //inicializar tablas D
+        let tablasP = []; //inicializar tablas P
 
         let tablaD0 = [];
         let tablaP0 = [];
@@ -176,10 +173,10 @@ function RutasMasCortas() {
             let filaD = [];
             let filaP = [];
             for (let j = 0; j < cantidadNodos; j++) {
-                if (i === j) {
+                if (i === j) { //si el nodo origen es igual al nodo destino, la distancia es 0
                     filaD.push(0);
                     filaP.push(0);
-                } else {
+                } else { //si no, la distancia es la distancia de la matriz de rutas
                     filaD.push(rutas[i][j]);
                     filaP.push(0);
                 }
@@ -193,32 +190,33 @@ function RutasMasCortas() {
 
 
 
-        for (let k = 1; k <= cantidadNodos; k++) {
+        for (let k = 1; k <= cantidadNodos; k++) { //calcular las tablas D y P
             let tablaD = [];
             let tablaP = [];
             for (let i = 0; i < cantidadNodos; i++) {
                 let filaD = [];
                 let filaP = [];
                 for (let j = 0; j < cantidadNodos; j++) {
-                    let d1 = tablasD[k - 1][i][j] === "X" ? Infinity : parseInt(tablasD[k - 1][i][j], 10);
-                    let d2 = tablasD[k - 1][i][k - 1] === "X" || tablasD[k - 1][k - 1][j] === "X"
+                    let d1 = tablasD[k - 1][i][j] === "X" ? Infinity : parseInt(tablasD[k - 1][i][j], 10); //distancia de la tabla D en la posición i,j
+                    let d2 = tablasD[k - 1][i][k - 1] === "X" || tablasD[k - 1][k - 1][j] === "X" //distancia de la tabla D en la posición i,k y k,j
                         ? Infinity
                         : parseInt(tablasD[k - 1][i][k - 1], 10) + parseInt(tablasD[k - 1][k - 1][j], 10);
 
-                    if (d1 === Infinity && d2 === Infinity) {
+                    if (d1 === Infinity && d2 === Infinity) { //si ambas distancias son infinito, la distancia es infinito
                         filaD.push("∞");
                         filaP.push("∞");
-                    } else if (d1 === Infinity) {
+                    } else if (d1 === Infinity) { //si la distancia 1 es infinito, la distancia es la distancia 2
                         filaD.push(d2);
                         filaP.push(k);
-                    } else if (d2 === Infinity) {
+                    } else if (d2 === Infinity) { //si la distancia 2 es infinito, la distancia es la distancia 1
                         filaD.push(d1);
                         filaP.push(tablasP[k - 1][i][j]);
-                    } else {
-                        if (d1 <= d2) {
+                    } else { //si no, la distancia es la menor de las dos distancias
+                        console.log("d1", d1, "d2", d2);
+                        if (d1 <= d2) { //si la distancia 1 es menor o igual a la distancia 2
                             filaD.push(d1);
                             filaP.push(tablasP[k - 1][i][j]);
-                        } else {
+                        } else { //si no, la distancia es la distancia 2
                             filaD.push(d2);
                             filaP.push(k);
                         }
@@ -231,12 +229,13 @@ function RutasMasCortas() {
             tablasP.push(tablaP);
         }
 
-        setTablasD(tablasD);
-        setTablasP(tablasP);
-        console.log("tablasD", tablasD);
-        console.log("tablasP", tablasP);
+        setTablasD(tablasD); //guardar tablas D
+        setTablasP(tablasP); //guardar tablas P
     };
 
+
+    //Renderiza las tablas D
+    //Crea el HTML de las tablas D
     const renderizarTablasD = () => {
         return (
             tablasD.map((tablaD, index) => (
@@ -279,6 +278,8 @@ function RutasMasCortas() {
         )
     }
 
+    //Renderiza las tablas P
+    //Crea el HTML de las tablas P
     const renderizarTablasP = () => {
         return (
             tablasP.map((tablaP, index) => (
@@ -320,6 +321,8 @@ function RutasMasCortas() {
         )
     }
 
+
+    //Maneja el cambio de los nombres de los nodos
     const handleNombreNodoChange = (index, value) => {
         setNombresPorDefecto((prev) => {
             const newNombres = [...prev];
@@ -328,6 +331,7 @@ function RutasMasCortas() {
         });
     };
 
+    //Genera la tabla D0
     const generarTablaD0 = () => {
         return (
             <table className="table tablaD0">
@@ -386,6 +390,7 @@ function RutasMasCortas() {
         );
     }
 
+    //Función para calcular la ruta más corta entre dos nodos
     const calcularRutaMasCorta = (e) => {
         e.preventDefault();
         const nodoOrigen = parseInt(document.getElementById("nodoOrigen").value, 10);
@@ -409,11 +414,11 @@ function RutasMasCortas() {
                 rutaMasCorta += ` -> ${nodoDestino}`;
             }
         }
-        console.log("rutaMasCorta", rutaMasCorta);
         setMostrarRutaMasCorta(rutaMasCorta);
     }
 
-
+    //Renderiza la ruta más corta
+    //Crea el HTML de la ruta más corta
     const renderRutaMasCorta = () => {
         let ruta = mostrarRutaMasCorta.split(" -> ");
         console.log("ruta", ruta);
@@ -435,15 +440,16 @@ function RutasMasCortas() {
     }
 
 
-    
 
+
+    //Renderizar el componente
     return (
         <div className="rutas-mas-cortas">
             <h1>Rutas más cortas</h1>
-            <p className='descripcion-problema'> 
-                Dada una red de transporte con n nodos, se desea encontrar la ruta más corta entre dos nodos. 
+            <p className='descripcion-problema'>
+                Dada una red de transporte con n nodos, se desea encontrar la ruta más corta entre dos nodos.
                 Para ello, se debe calcular la matriz de rutas más cortas D</p>
-                <div className="form-group">
+            <div className="form-group">
                 <label htmlFor="cantidadNodos">Cantidad de nodos</label>
                 <input
                     type="number"
@@ -451,19 +457,20 @@ function RutasMasCortas() {
                     value={cantidadNodos} onChange={handleCantidadNodosChange}
                     min={2}
                     max={10}
+                    disabled={bloquearInputs}
 
                 />
                 {errores.cantidadNodos && <p className="error" >*{errores.cantidadNodos}</p>}
             </div>
-            
+
             <div className="table-container">
                 {generarTablaD0()}
             </div>
             <div className="grafico-rutas">
                 {console.log("rutas", rutas)}
-                <GraphComponent 
+                <GraphComponent
                     matrix={rutas}
-                    nodeNames={nombresPorDefecto} 
+                    nodeNames={nombresPorDefecto}
                 />
             </div>
             <div className="button-group-rutas">
@@ -472,8 +479,8 @@ function RutasMasCortas() {
 
                 <button className="primary-button" onClick={limpiar}>Limpiar</button>
                 <button
-                style={{marginLeft: 'auto'}}
-                className="primary-button" 
+                    style={{ marginLeft: 'auto' }}
+                    className="primary-button"
                     onClick={calcularRutasMasCortas}
                 >Calcular</button>
             </div>
@@ -513,7 +520,7 @@ function RutasMasCortas() {
                 {mostrarRutaMasCorta.length > 0 &&
                     <div className="ruta-mas-corta">
                         <label>Ruta más corta:</label>
-                        {renderRutaMasCorta()}
+                        {renderRutaMasCorta()} 
                     </div>}
 
 

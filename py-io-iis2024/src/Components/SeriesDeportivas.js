@@ -2,20 +2,21 @@ import React from "react";
 import { useState, useEffect } from "react";
 
 function SeriesDeportivas() {
-
+    //Estado para guardar la matriz de partidos
     const [matrizPartidos, setMatrizPartidos] = useState([]);
-    const [formValues, setFormValues] = useState({
+    const [formValues, setFormValues] = useState({//Estado para guardar los valores del formulario, se inicializa con valores por defecto
         probabilidadGanarCasaA: '0.5',
         probabilidadGanarVisitaA: '0.5',
         numeroMaximoPartidos: '1',
         distribucionPartidos: []
     });
 
-    const [valoresOperacion, setValoresOperacion] = useState({});
+    const [valoresOperacion, setValoresOperacion] = useState({}); //Estado para guardar los valores de la operación
     const [errores, setErrores] = useState({});
 
 
-
+    //Función para obtener la matriz de partidos
+    //Se calcula la probabilidad de ganar la serie en función del número de partidos jugados
     const obtenerMatriz = () => {
         if (valoresOperacion.numeroMaximoPartidos > 11) {
             setErrores({ ...errores, numeroMaximoPartidos: "El número máximo de partidos no puede ser mayor a 11." });
@@ -32,20 +33,20 @@ function SeriesDeportivas() {
                     matriz[i][j] = 1.0000;
                 } else {
                     console.log(formValues.distribucionPartidos[j]);
-                    if (formValues.distribucionPartidos[j - 2 + i] === 'A') {
+                    if (formValues.distribucionPartidos[j - 2 + i] === 'A') { //Si el partido lo juega A en casa
                         matriz[i][j] = (valoresOperacion.Ph * matriz[i - 1][j] + valoresOperacion.qr * matriz[i][j - 1]).toFixed(4);
                     }
-                    else {
+                    else { //Si el partido lo juega A de visita
                         matriz[i][j] = (valoresOperacion.pr * matriz[i - 1][j] + valoresOperacion.qh * matriz[i][j - 1]).toFixed(4);
                     }
                 }
             }
         }
-        console.log(matriz);
         setMatrizPartidos(matriz);
     }
 
 
+    //Función para manejar el cambio en los valores del formulario
     const handleChageForm = (e) => {
         setFormValues({
             ...formValues,
@@ -53,6 +54,8 @@ function SeriesDeportivas() {
         });
     }
 
+    //Función para manejar la distribución de partidos
+    //Se cambia la distribución de partidos de A a B y viceversa al hacer click en el botón
     const handleDistribucionPartidos = (index) => {
         setFormValues((prevValues) => {
             const distribucionNueva = [...prevValues.distribucionPartidos];
@@ -61,6 +64,7 @@ function SeriesDeportivas() {
         });
     };
 
+    //Función para renderizar los botones de la distribución de partidos
     const renderDistribucionPartidos = () => {
         if (formValues.numeroMaximoPartidos === '') return null;
         if (formValues.numeroMaximoPartidos < 1) return null;
@@ -70,7 +74,7 @@ function SeriesDeportivas() {
 
                 key={index}
                 type="button"
-                className={formValues.distribucionPartidos[index] === 'A' ? 'juegaLocal' : 'juegaVisita'}
+                className={formValues.distribucionPartidos[index] === 'A' ? 'juegaLocal' : 'juegaVisita'} //Se cambia el color del botón según el equipo que juega
                 onClick={() => handleDistribucionPartidos(index)}
             >
                 {formValues.distribucionPartidos[index] || 'B'}
@@ -80,10 +84,9 @@ function SeriesDeportivas() {
     };
 
 
-
+    //Al enviar el formulario se almacenan los valores en el estado y se calcula la matriz de partidos
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formValues);
 
         if (validateForm()) {
             setValoresOperacion({
@@ -103,16 +106,15 @@ function SeriesDeportivas() {
 
     }
 
-
+    //Se calcula la matriz de partidos cada vez que cambian los valores de la operación
     useEffect(() => {
         if (Object.keys(valoresOperacion).length > 0) {
             obtenerMatriz();
         }
     }, [valoresOperacion]);
 
-
+    //Guarda el estado actual en un archivo txt
     const guardar = () => {
-        //guarda el estado actual en un archivo txt
         const textoDatosFormulario = JSON.stringify(formValues);
         const textoMatrizPartidos = JSON.stringify(matrizPartidos);
 
@@ -124,6 +126,7 @@ function SeriesDeportivas() {
         documento.click();
     }
 
+    //Carga los datos de un archivo txt
     const cargarDatos = (e) => {
         e.preventDefault();
         errores.cargarDatos = null;
@@ -165,14 +168,17 @@ function SeriesDeportivas() {
 
     };
 
+    //Valida que los valores del formulario sean un objeto y que no sean nulos
     const validateFormValues = (formValues) => {
         return typeof formValues === 'object' && formValues !== null;
     };
 
+    //Valida que la matriz de partidos sea un arreglo
     const validateMatrizPartidos = (matrizPartidos) => {
         return Array.isArray(matrizPartidos);
     };
 
+    //Valida que los valores del formulario sean correctos
     const validateForm = () => {
         let valido = true;
         let errores = {};

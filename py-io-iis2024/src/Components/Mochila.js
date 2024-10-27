@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 const Mochila = () => {
+    // Estados para los objetos, capacidad, matriz de solución, tipo de mochila, componentes de la solución y cantidades de cada componente
     const [objetos, setObjetos] = useState([]);
     const [capacidad, setCapacidad] = useState(0);
     const [matrizSolucion, setMatrizSolucion] = useState([]);
@@ -12,6 +13,8 @@ const Mochila = () => {
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"
     ]);
 
+
+    // Funciones para agregar y eliminar objetos
     const handleAddObjeto = () => {
         if (objetos.length < 10) {
             setObjetos([...objetos, { nombre: nombresPorDefecto[objetos.length], costo: 0, valor: 0, cantidad: 1 }]);
@@ -28,6 +31,8 @@ const Mochila = () => {
         }
     };
 
+
+    //Generar matriz de solución del problema de la mochila
     const generarMatrizSolucion = () => {
 
 
@@ -43,12 +48,14 @@ const Mochila = () => {
                         matrizCantidades[i][j] = 0;
                     } else if (j === 0) {
                         if (Number(objetos[j].costo) <= i) {
+                            // si el costo del objeto es menor o igual a la capacidad actual, tomo la cantidad máxima de ese objeto
                             dp[i][j] = Math.min(Math.floor(i / Number(objetos[j].costo)), Number(objetos[j].cantidad)) * Number(objetos[j].valor);
                             matrizCantidades[i][j] = Math.min(Math.floor(i / Number(objetos[j].costo)), Number(objetos[j].cantidad));
                         }
                     } else {
                         dp[i][j] = dp[i][j - 1];
                         for (let k = 1; k <= Number(objetos[j].cantidad) && k * Number(objetos[j].costo) <= i; k++) {
+                            // si el costo del objeto es menor o igual a la capacidad actual, tomo la cantidad máxima de ese objeto
                             dp[i][j] = Math.max(dp[i][j], k * Number(objetos[j].valor) + dp[i - k * Number(objetos[j].costo)][j - 1]);
                             if (dp[i][j] === k * Number(objetos[j].valor) + dp[i - k * Number(objetos[j].costo)][j - 1]) {
                                 matrizCantidades[i][j] = k;
@@ -65,11 +72,13 @@ const Mochila = () => {
                         dp[i][j] = 0;
                         matrizCantidades[i][j] = 0;
                     } else if (j === 0) {
+                        // si el costo del objeto es menor o igual a la capacidad actual, tomo la cantidad máxima de ese objeto
                         if (Number(objetos[j].costo) <= i) {
                             dp[i][j] = Math.floor(i / Number(objetos[j].costo)) * Number(objetos[j].valor);
                             matrizCantidades[i][j] = Math.floor(i / Number(objetos[j].costo));
                         }
                     } else {
+                        // si no tomo el objeto actual, el valor es el mismo que el anterior
                         dp[i][j] = dp[i][j - 1];
                         if (Number(objetos[j].costo) <= i) {
                             dp[i][j] = Math.max(dp[i][j], Number(objetos[j].valor) + dp[i - Number(objetos[j].costo)][j]);
@@ -102,8 +111,7 @@ const Mochila = () => {
             }
         }
 
-        console.log(dp);
-        console.log(matrizCantidades);
+        // actualizar estados
         setMatrizCantidades(matrizCantidades);
         setMatrizSolucion(dp);
 
@@ -116,12 +124,15 @@ const Mochila = () => {
         }
     }, [matrizSolucion]);
 
+    // Cargar objetos por defecto
     useEffect(() => {
         setObjetos([
             { nombre: 'A', costo: 2, valor: 3, cantidad: 2 }
         ]);
     }, []);
 
+    // Encontrar los componentes de la solución
+    // Devuelve un arreglo con los nombres de los componentes y otro con las cantidades de cada componente
     const encontrarComponentesSolucion = () => {
         const componentes = [];
         const cantidades = [];
@@ -141,7 +152,7 @@ const Mochila = () => {
             componentes.push(objetos[j].nombre);
             cantidades.push(matrizCantidades[i][j]);
         }
-        console.log(cantidades);
+        // actualizar estados
         setCantidadesSolucion(cantidades);
         setComponentesSolucion(componentes);
     };
@@ -149,6 +160,7 @@ const Mochila = () => {
 
 
 
+    // Cargar y guardar archivo
     const cargarArchivo = () => {
         limpiar();
         const input = document.createElement('input');
@@ -177,6 +189,7 @@ const Mochila = () => {
         a.click();
     }
 
+    // Limpiar los estados
     const limpiar = () => {
         setObjetos([
             { nombre: 'A', costo: 2, valor: 3, cantidad: 2 }
@@ -186,8 +199,8 @@ const Mochila = () => {
         setComponentesSolucion([]);
     }
 
+    //generar forma matemática del problema para los valores ingresados
     const generarFormaMatematica = () => {
-        //generar forma matemática del problema para los valores ingresados
         let formaMatematica = "";
         if (tipo === "bounded") {
             formaMatematica += "Maximizar:<br>";

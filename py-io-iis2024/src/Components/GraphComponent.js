@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Network } from 'vis-network/standalone/esm/vis-network';
+import { Network } from 'vis-network/standalone/esm/vis-network'; //Se importa la librería vis-network para visualizar el grafo
 
 // Convertir la tabla d0 en formato de nodos y aristas (edges)
 const createGraphData = (matrix, nodeNames) => {
@@ -32,20 +32,42 @@ const GraphComponent = ({ matrix, nodeNames }) => {
     const options = {
       nodes: {
         shape: 'dot',
-        size: 16,
-        color: '#4CAF50',
-        font: { color: '#000000' },
+        size: 20,  // Nodos ligeramente más grandes para 10 nodos
+        color: '#99ccff',
+        font: { color: '#000000', size: 16 },  // Tamaño del texto de los nodos
       },
       edges: {
         color: '#848484',
         arrows: 'to',
+        font: {
+          color: '#000000',
+          size: 14,  // Tamaño de la etiqueta del peso
+          align: 'horizontal',
+        },
+        smooth: {
+          enabled: true,  // Activar curvas en las conexiones
+        }
       },
       physics: {
-        enabled: false,
-        
+        enabled: true,  // Activar física para mejorar la distribución
+        barnesHut: {  
+          gravitationalConstant: -3000,  // Reducir repulsión para nodos conectados
+          centralGravity: 0.2,  // Aumentar la gravedad central para que los nodos desconectados no se vayan demasiado lejos
+          springLength: 200,  // Longitud de resorte para mantener nodos separados moderadamente
+          springConstant: 0.05,  // Resorte flexible para buena distribución
+          avoidOverlap: 1  // Evitar superposición entre nodos
+        },
+        solver: 'barnesHut',
+        stabilization: {
+          enabled: true,
+          iterations: 500,  // Menos iteraciones para estabilizar rápido
+          updateInterval: 50,
+        },
       },
+      layout: {
+        improvedLayout: true,  // Mejorar layout inicial
+      }
     };
-
     const network = new Network(networkContainer.current, graphData, options);
 
     return () => {
@@ -56,7 +78,8 @@ const GraphComponent = ({ matrix, nodeNames }) => {
   return <div 
               ref={networkContainer} 
               style={{ 
-                height: '300px', 
+                height: '800px', 
+                width: '100%',
                 borderRadius: '10px',
               }} />;
 };

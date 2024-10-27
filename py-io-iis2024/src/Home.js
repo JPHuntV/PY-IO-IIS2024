@@ -6,8 +6,10 @@ import ArbolesBinariosBusqueda from './Components/ArbolesBinariosBusqueda.js';
 import RutasMasCortas from './Components/RutasMasCortas.js';
 
 const Home = () => {
+    //Muestra el contenido de la pestaña seleccionada
     const [selectedTab, setSelectedTab] = useState('seriesDeportivas');
 
+    //Función que renderiza el contenido de la pestaña seleccionada
     const renderTab = () => {
         switch(selectedTab) {
             case 'seriesDeportivas':
