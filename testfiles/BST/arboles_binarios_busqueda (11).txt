@@ -1,0 +1,1 @@
+{"n":5,"nodos":[{"llave":"Overwatch","peso":3},{"llave":"Valorant","peso":1},{"llave":"CSGO","peso":2},{"llave":"LOL","peso":4},{"llave":"COD","peso":8}],"matrizPesos":[],"matrizR":[]}

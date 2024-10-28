@@ -1,0 +1,2 @@
+{"probabilidadGanarCasaA":"0.87","probabilidadGanarVisitaA":"0.22","numeroMaximoPartidos":"9","distribucionPartidos":["B","A","B","A","B","B","A","B","A"]}
+[[0,1,1,1],[0,"0.3300","0.4975","0.6633"],[0,"0.0825","0.2195","0.3305"],[0,"0.0272","0.0753","0.1595"]]

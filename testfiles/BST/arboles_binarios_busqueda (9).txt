@@ -1,0 +1,1 @@
+{"n":10,"nodos":[{"llave":"Francia","peso":12},{"llave":"Alemania","peso":34},{"llave":"Korea","peso":10},{"llave":"Italia","peso":32},{"llave":"Costa Rica","peso":10},{"llave":"Estados Unidos","peso":45},{"llave":"Canada","peso":54},{"llave":"Colombia","peso":14},{"llave":"Inglaterra","peso":22},{"llave":"Japon","peso":78}],"matrizPesos":[],"matrizR":[]}

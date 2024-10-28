@@ -1,0 +1,1 @@
+{"n":4,"nodos":[{"llave":"Lenon","peso":0.4},{"llave":"Stewart","peso":0.22},{"llave":"Solis","peso":0.55},{"llave":"Smith","peso":0.33}],"matrizPesos":[],"matrizR":[]}

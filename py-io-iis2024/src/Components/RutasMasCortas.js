@@ -20,7 +20,7 @@ function RutasMasCortas() {
     const [tablasD, setTablasD] = useState([]);
     const [tablasP, setTablasP] = useState([]);
     const [bloquearInputs, setBloquearInputs] = useState(false);
-
+    
 
     //Inicializar nodos y rutas al cargar el componente
     useEffect(() => {
@@ -87,6 +87,7 @@ function RutasMasCortas() {
 
     //Carga un archivo con las rutas más cortas
     const cargarArchivo = (e) => {
+        let errores = {};
         e.preventDefault();
         limpiar();
         const file = document.createElement("input");
@@ -95,17 +96,37 @@ function RutasMasCortas() {
         file.onchange = (e) => {
             const reader = new FileReader();
             reader.onload = (e) => {
-                const contenido = e.target.result;
-                const rutas = JSON.parse(contenido);
-                const cantidadNodos = rutas.length;
-                setCantidadNodos(cantidadNodos);
-                setRutas(rutas);
-                setArchivo(rutas);
-            }
+                try {
+                    const contenido = e.target.result;
+                    const rutas = JSON.parse(contenido);
+                    if (validateData(rutas)) {
+                        const cantidadNodos = rutas.length;
+                        setCantidadNodos(cantidadNodos);
+                        setRutas(rutas);
+                        setArchivo(rutas);
+                    } else {
+                        throw new Error('El archivo no contiene los datos esperados.');
+                    }
+                } catch (error) {
+                    errores.archivo = "El archivo no contiene los datos esperados.";
+                    setErrores(errores);
+                }
+            };
             reader.readAsText(e.target.files[0]);
-        }
+        };
         file.click();
-    }
+    };
+
+    // Función para validar la estructura de los datos
+const validateData = (data) => {
+    return (
+        Array.isArray(data) &&
+        data.every(row => 
+            Array.isArray(row) &&
+            row.every(cell => typeof cell === 'number')
+        )
+    );
+};
 
     //Inicializa las rutas con valores por defecto
     const inicializarRutas = () => {
@@ -203,8 +224,8 @@ function RutasMasCortas() {
                         : parseInt(tablasD[k - 1][i][k - 1], 10) + parseInt(tablasD[k - 1][k - 1][j], 10);
 
                     if (d1 === Infinity && d2 === Infinity) { //si ambas distancias son infinito, la distancia es infinito
-                        filaD.push("∞");
-                        filaP.push("∞");
+                        filaD.push("X");
+                        filaP.push("X");
                     } else if (d1 === Infinity) { //si la distancia 1 es infinito, la distancia es la distancia 2
                         filaD.push(d2);
                         filaP.push(k);
@@ -484,6 +505,7 @@ function RutasMasCortas() {
                     onClick={calcularRutasMasCortas}
                 >Calcular</button>
             </div>
+            {errores.archivo && <p className="error" >*{errores.archivo}</p>}
             <div className="tablas-resultados">
                 <div className="tablasD">
                     {tablasDResultados.length > 0 && <h2>Tablas D</h2>}

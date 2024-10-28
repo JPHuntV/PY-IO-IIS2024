@@ -1,0 +1,37 @@
+{
+  "objetos": [
+    {
+      "nombre": "Medias",
+      "costo": 2,
+      "valor": 3,
+      "cantidad": 2
+    },
+    {
+      "nombre": "Agua",
+      "costo": "1",
+      "valor": "4",
+      "cantidad": "8"
+    },
+    {
+      "nombre": "Atun",
+      "costo": "1",
+      "valor": "8",
+      "cantidad": "5"
+    },
+    {
+      "nombre": "Alchohol",
+      "costo": "4",
+      "valor": "20",
+      "cantidad": "Infinity"
+    },
+    {
+      "nombre": "Lentes",
+      "costo": "2",
+      "valor": "1",
+      "cantidad": "2"
+    }
+  ],
+  "capacidad": "20",
+  "matrizSolucion": [],
+  "tipo": "bounded"
+}

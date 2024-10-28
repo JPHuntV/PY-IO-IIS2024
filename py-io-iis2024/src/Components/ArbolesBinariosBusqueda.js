@@ -10,6 +10,7 @@ function ArbolesBinariosBusqueda() {
     const [cargando, setCargando] = useState(false); // Se está cargando un archivo
     const [bloquear, setBloquear] = useState(false); // Bloquear inputs
     const [orgChart, setOrgChart] = useState({}); // Estructura para visualizar el árbol, ver documentación de react-d3-tree
+    const [error, setError] = useState(''); // Mensaje de error
 
     //Cada vez que se cambie el valor de n, se generan los nodos
     useEffect(() => {
@@ -43,23 +44,39 @@ function ArbolesBinariosBusqueda() {
         let input = document.createElement('input');
         input.type = 'file';
         input.onchange = e => {
-            let file = e.target.files[0];
-            let reader = new FileReader();
-            reader.readAsText(file, 'UTF-8');
-            reader.onload = readerEvent => {
-                let content = readerEvent.target.result;
-                let data = JSON.parse(content);
-                //Establecer los valores de los estados
+          let file = e.target.files[0];
+          let reader = new FileReader();
+          reader.readAsText(file, 'UTF-8');
+          reader.onload = readerEvent => {
+            let content = readerEvent.target.result;
+            try {
+              let data = JSON.parse(content);
+              // Validar que el archivo contenga los datos esperados
+              if (
+                data.nodos &&
+                Array.isArray(data.nodos) &&
+                typeof data.n === 'number' &&
+                Array.isArray(data.matrizPesos) &&
+                Array.isArray(data.matrizR)
+              ) {
+                // Establecer los valores de los estados
                 setNodos(data.nodos);
                 setCargando(true);
                 setN(data.n);
                 setMatrizPesos(data.matrizPesos);
                 setMatrizR(data.matrizR);
                 setBloquear(false);
+                setError('');
+              } else {
+                throw new Error('El archivo no contiene los datos esperados.');
+              }
+            } catch (error) {
+              setError('Error al cargar el archivo: ' + error.message);
             }
-        }
+          };
+        };
         input.click();
-    }
+      };
 
     //Calcular matriz de pesos y matriz R
     const calcularMatrizPesos = () => {
@@ -205,6 +222,7 @@ function ArbolesBinariosBusqueda() {
                 <button className="primary-button" onClick={() => cargarArchivo()}>Cargar archivo</button>
                 <button className="primary-button" onClick={() => guardarArchivo()}>Guardar archivo</button>
             </div>
+            {error && <p className='error'>{error}</p>}
             {n > 0 && (
                 <div className='nodos-bst'>
                     <div className='form-group'>

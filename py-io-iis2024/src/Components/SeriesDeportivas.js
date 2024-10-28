@@ -289,8 +289,8 @@ function SeriesDeportivas() {
                         <button
                             style={{marginLeft: 'auto'}}
                             className="primary-button" type="submit">Calcular solución</button>
-                        {errores.cargarDatos && <div className="error">*{errores.cargarDatos}</div>}
                     </div>
+                        {errores.cargarDatos && <div className="error">*{errores.cargarDatos}</div>}
                 </form>
 
                 {matrizPartidos.length > 0 && (

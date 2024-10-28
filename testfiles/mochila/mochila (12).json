@@ -1,0 +1,31 @@
+{
+  "objetos": [
+    {
+      "nombre": "Medias",
+      "costo": 2,
+      "valor": 3,
+      "cantidad": 2
+    },
+    {
+      "nombre": "Galletas",
+      "costo": "3",
+      "valor": "5",
+      "cantidad": "3"
+    },
+    {
+      "nombre": "Agua",
+      "costo": "1",
+      "valor": "4",
+      "cantidad": "8"
+    },
+    {
+      "nombre": "Cobija",
+      "costo": "8",
+      "valor": "4",
+      "cantidad": "3"
+    }
+  ],
+  "capacidad": "18",
+  "matrizSolucion": [],
+  "tipo": "bounded"
+}

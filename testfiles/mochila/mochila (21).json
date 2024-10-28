@@ -1,0 +1,68 @@
+{
+  "objetos": [
+    {
+      "nombre": "Medias",
+      "costo": 2,
+      "valor": "21",
+      "cantidad": 2
+    },
+    {
+      "nombre": "Cobija",
+      "costo": "2",
+      "valor": "4",
+      "cantidad": 0
+    },
+    {
+      "nombre": "Lentes",
+      "costo": "2",
+      "valor": "1",
+      "cantidad": "2"
+    },
+    {
+      "nombre": "Sombrero",
+      "costo": "3",
+      "valor": "4",
+      "cantidad": 1
+    }
+  ],
+  "capacidad": 20,
+  "matrizSolucion": [
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      21,
+      21,
+      21,
+      21
+    ],
+    [
+      21,
+      21,
+      21,
+      21
+    ],
+    [
+      42,
+      42,
+      42,
+      42
+    ],
+    [
+      42,
+      42,
+      42,
+      42
+    ]
+  ],
+  "tipo": "unbounded"
+}

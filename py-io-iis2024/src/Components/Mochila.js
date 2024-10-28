@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 const Mochila = () => {
     // Estados para los objetos, capacidad, matriz de solución, tipo de mochila, componentes de la solución y cantidades de cada componente
     const [objetos, setObjetos] = useState([]);
+    const [errores, setErrores] = useState([]);
     const [capacidad, setCapacidad] = useState(0);
     const [matrizSolucion, setMatrizSolucion] = useState([]);
     const [matrizCantidades, setMatrizCantidades] = useState([]);
@@ -170,15 +171,40 @@ const Mochila = () => {
             const file = e.target.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
-                const data = JSON.parse(e.target.result);
-                setObjetos(data.objetos);
-                setCapacidad(data.capacidad);
-                setTipo(data.tipo);
+                try {
+                    const data = JSON.parse(e.target.result);
+                    // Validate the structure of the data
+                    if (validateData(data)) {
+                        setObjetos(data.objetos);
+                        setCapacidad(data.capacidad);
+                        setTipo(data.tipo);
+                    } else {
+                        throw new Error('El archivo no contiene los datos esperados.');
+                    }
+                } catch (error) {
+                    setErrores([...errores, error.message]);
+                }
             };
             reader.readAsText(file);
         };
         input.click();
     };
+
+// Validar la estructura de los datos
+const validateData = (data) => {
+    return (
+        data &&
+        Array.isArray(data.objetos) &&
+        typeof data.capacidad === 'number' &&
+        typeof data.tipo === 'string' &&
+        data.objetos.every(obj => 
+            typeof obj.nombre === 'string' &&
+            typeof obj.costo === 'number' &&
+            typeof obj.valor === 'number' &&
+            typeof obj.cantidad === 'number'
+        )
+    );
+};
 
     const guardarArchivo = () => {
         const data = { objetos, capacidad, matrizSolucion, tipo };
@@ -365,6 +391,7 @@ const Mochila = () => {
                         Calcular solución
                     </button>
                 </div>
+                {errores.message && ( <div className='errores'> {errores.message} </div>)}
                 {matrizSolucion.length > 0 && (
                     <div className='solucion'>
                 <div className='forma-matematica'>
